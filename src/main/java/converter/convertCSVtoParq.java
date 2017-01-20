@@ -26,7 +26,7 @@ public class convertCSVtoParq {
         SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
 
 
-        convertOrdersTable(sqlContext);
+        //convertOrdersTable(sqlContext);
         convertLineItemTable(sqlContext);
 
 
@@ -41,6 +41,9 @@ public class convertCSVtoParq {
 
         //example
         //1|63700|3701|3|8|13309.60|0.10|0.02|N|O|1996-01-29|1996-03-05|1996-01-31|TAKE BACK RETURN|REG AIR|riously. regular, express dep|
+        //1009858|55486|5487|5|47|67749.56|0.02|0.04|A|F|1993-10-28|1993-10-30|1993-11-15|COLLECT COD|FOB|ubt slyly ironic a|
+        //1009858|149067|6610|6|42|46874.52|0.04|0.08|A|F|1993-08-19|1993-10-25|1993-08-26|NONE|FOB|s can use. bold, regular instr|
+
 
         // LINEITEM Table Layout
         // Column Name Datatype Requirements Comment
@@ -61,6 +64,36 @@ public class convertCSVtoParq {
         // L_SHIPMODE fixed text, size 10
         // L_COMMENT variable text size 44
         // Primary Key: L_ORDERKEY, L_LINENUMBER
+
+        StructType customSchema = new StructType(new StructField[] {
+                new StructField("orderkey", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("partkey", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("suppkey", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("linenumber", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("quantity", DataTypes.IntegerType, true, Metadata.empty()), // original schema was decimal
+                new StructField("extendedprice", DataTypes.createDecimalType(10,2), true, Metadata.empty()),
+                new StructField("discount", DataTypes.createDecimalType(3,2), true, Metadata.empty()),
+                new StructField("tax", DataTypes.createDecimalType(3,2), true, Metadata.empty()),
+                new StructField("returnflag", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("linestatus", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("shipdate", DataTypes.DateType, true, Metadata.empty()),
+                new StructField("commitdate", DataTypes.DateType, true, Metadata.empty()),
+                new StructField("receiptdate", DataTypes.DateType, true, Metadata.empty()),
+                new StructField("shipinstruct", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("shipmode", DataTypes.StringType, true, Metadata.empty()),
+                new StructField("comment", DataTypes.StringType, true, Metadata.empty())
+        });
+
+
+        DataFrame df = sqlContext.read()
+                .format("com.databricks.spark.csv")
+                .schema(customSchema)
+                .option("delimiter", "|")
+                .option("dateFormat", "YYYY-MM-DD")
+                .load("file:///home/khorm/TestGrounds/DB/lineitem.tbl");
+
+
+        df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
 
     }
 
