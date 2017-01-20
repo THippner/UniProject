@@ -4,9 +4,52 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>cloudera</id>-->
+            <!--<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>-->
+        <!--</repository>-->
+    <!--</repositories>-->
+
+
     <groupId>TomaszHippner</groupId>
     <artifactId>SparkOptimiser</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core_2.10 -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.10</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+
+        <!-- SPARK CSV  -->
+        <dependency>
+            <groupId>com.databricks</groupId>
+            <artifactId>spark-csv_2.10</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <!-- cloudera 5.8.2 -  spark core 1.6.0  -->
+    <!--<dependencies>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.spark</groupId>-->
+            <!--<artifactId>spark-core_2.10</artifactId> &lt;!&ndash; matching Scala version &ndash;&gt;-->
+            <!--<version>1.6.0-cdh5.8.2</version>  &lt;!&ndash; matching Spark Core version &ndash;&gt;-->
+        <!--</dependency>-->
+
+    <!--</dependencies>-->
+
 
 
 </project>
