@@ -20,7 +20,7 @@ public class convertCSVtoParq {
 
     public static void main(String[] args) {
 
-        SparkConf conf = new SparkConf().setAppName("test").setMaster("local");
+        SparkConf conf = new SparkConf().setAppName("test2").setMaster("local[2]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
@@ -93,7 +93,15 @@ public class convertCSVtoParq {
                 .load("file:///home/khorm/TestGrounds/DB/lineitem.tbl");
 
 
-        df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
+        //df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
+
+        // execute test query
+        df.registerTempTable("lineitem");
+
+        DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < 600");
+
+        result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
+
 
     }
 
