@@ -20,7 +20,7 @@ public class convertCSVtoParq {
 
     public static void main(String[] args) {
 
-        SparkConf conf = new SparkConf().setAppName("test2").setMaster("local[2]");
+        SparkConf conf = new SparkConf().setAppName("UniProject").setMaster("local[2]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
@@ -31,17 +31,54 @@ public class convertCSVtoParq {
 
 
 
+
+
         lineitem.registerTempTable("lineitem");
         orders.registerTempTable("orders");
 
 
-        // execute queries
-        DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < 600");
+
+        int[] dataThreasholds = {600000,
+                                1200000,
+                                1800000,
+                                2400000,
+                                3000000,
+                                3600000,
+                                4200000,
+                                4800000,
+                                5400000,
+                                6001215};
+
+
+
+
+        // Orders 10 to 100% range
+        for(int i = 0; i< 10; i++){
+
+            sc.setJobGroup("TH", "Orders - " + dataThreasholds[i] + " (" + (i+1) + "0%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + dataThreasholds[i]);
+            result.count();
+        }
+
+
+
+
+
+        //DataFrame result1 = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < 1200000");
+        //DataFrame result2 = sqlContext.sql("SELECT * FROM orders WHERE orderkey < 1200000");
+
+
+
+        // force spark to execute queries
+        //result1.count();
+        //result1.save("file:///home/khorm/TestGrounds/test1");
+        //result2.count();
+        //result1.save("file:///home/khorm/TestGrounds/test2");
+
 
 
         // save file
-        result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
-
+        //result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
 
 
 
