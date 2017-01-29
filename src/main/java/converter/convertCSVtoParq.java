@@ -38,7 +38,7 @@ public class convertCSVtoParq {
 
 
 
-        int[] dataThreasholds = {600000,
+        int[] dataRanges = {600000,
                                 1200000,
                                 1800000,
                                 2400000,
@@ -50,15 +50,18 @@ public class convertCSVtoParq {
                                 6001215};
 
 
-        //runOrdersThresholds(sc, sqlContext, dataThreasholds);
-        //runLineItemThresholds(sc, sqlContext, dataThreasholds)
+        //runOrdersRanges(sc, sqlContext, dataRanges);
+        //runLineItemRanges(sc, sqlContext, dataRanges);
+        runOrdersLineItemJoinRanges(sc, sqlContext, dataRanges);
 
 
 
 
 
 
-        
+
+
+
 
         // save file
         //result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
@@ -69,23 +72,35 @@ public class convertCSVtoParq {
 
     }
 
-    private static void runLineItemThresholds(JavaSparkContext sc, SQLContext sqlContext, int[] dataThreasholds) {
+    private static void runOrdersLineItemJoinRanges(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
+
+        for(int i = 0; i< 10; i++) {
+
+            sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRanges[i]);
+            result.count();
+        }
+
+
+    }
+
+    private static void runLineItemRanges(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
 
         for(int i = 0; i< 10; i++){
 
-            sc.setJobGroup("TH", "LineItem - " + dataThreasholds[i] + " (" + (i+1) + "0%)");
-            DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataThreasholds[i]);
+            sc.setJobGroup("TH", "LineItem - " + dataRanges[i] + " (" + (i+1) + "0%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRanges[i]);
             result.count();
         }
 
     }
 
-    private static void runOrdersThresholds(JavaSparkContext sc, SQLContext sqlContext, int[] dataThreasholds) {
+    private static void runOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
         // Orders 10 to 100% range
         for(int i = 0; i< 10; i++){
 
-            sc.setJobGroup("TH", "Orders - " + dataThreasholds[i] + " (" + (i+1) + "0%)");
-            DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + dataThreasholds[i]);
+            sc.setJobGroup("TH", "Orders - " + dataRanges[i] + " (" + (i+1) + "0%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + dataRanges[i]);
             result.count();
         }
     }
