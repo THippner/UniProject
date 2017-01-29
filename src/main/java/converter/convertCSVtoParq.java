@@ -26,18 +26,32 @@ public class convertCSVtoParq {
         SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
 
 
-        //convertOrdersTable(sqlContext);
-        convertLineItemTable(sqlContext);
+        DataFrame lineitem = importLineItemTable(sqlContext);
+        DataFrame orders = importOrdersTable(sqlContext);
+
+
+
+        lineitem.registerTempTable("lineitem");
+        orders.registerTempTable("orders");
+
+
+        // execute queries
+        DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < 600");
+
+
+        // save file
+        result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
 
 
 
 
+        // close Spark
         sc.stop();
 
 
     }
 
-    private static void convertLineItemTable(SQLContext sqlContext) {
+    private static DataFrame importLineItemTable(SQLContext sqlContext) {
 
         //example
         //1|63700|3701|3|8|13309.60|0.10|0.02|N|O|1996-01-29|1996-03-05|1996-01-31|TAKE BACK RETURN|REG AIR|riously. regular, express dep|
@@ -95,17 +109,10 @@ public class convertCSVtoParq {
 
         //df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
 
-        // execute test query
-        df.registerTempTable("lineitem");
-
-        DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < 600");
-
-        result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
-
-
+       return df;
     }
 
-    private static void convertOrdersTable(SQLContext sqlContext){
+    private static DataFrame importOrdersTable(SQLContext sqlContext){
 
         //example
         // 1|36901|O|173665.47|1996-01-02|5-LOW|Clerk#000000951|0|nstructions sleep furiously among |
@@ -148,7 +155,8 @@ public class convertCSVtoParq {
                 .load("file:///home/khorm/TestGrounds/DB/orders.tbl");
 
 
-        df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/orders.parquet");
+        //df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/orders.parquet");
+        return df;
 
     }
 
