@@ -36,6 +36,11 @@ public class convertCSVtoParq {
         lineitem.registerTempTable("lineitem");
         orders.registerTempTable("orders");
 
+        // force tables into cache
+        lineitem.cache();
+        lineitem.count();
+        orders.cache();
+        orders.count();
 
 
         int[] dataRanges = {600000,
@@ -52,7 +57,8 @@ public class convertCSVtoParq {
 
         //runOrdersRanges(sc, sqlContext, dataRanges);
         //runLineItemRanges(sc, sqlContext, dataRanges);
-        runOrdersLineItemJoinRanges(sc, sqlContext, dataRanges);
+        //runOrdersJOINLineItemRangesOrders(sc, sqlContext, dataRanges);
+        //runOrdersJOINLineItemRangesLineItem(sc, sqlContext, dataRanges);
 
 
 
@@ -72,12 +78,26 @@ public class convertCSVtoParq {
 
     }
 
-    private static void runOrdersLineItemJoinRanges(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
+    private static void runOrdersJOINLineItemRangesOrders(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
 
         for(int i = 0; i< 10; i++) {
 
+
+
             sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
             DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRanges[i]);
+            result.count();
+        }
+
+
+    }
+
+    private static void runOrdersJOINLineItemRangesLineItem(JavaSparkContext sc, SQLContext sqlContext, int[] dataRanges) {
+
+        for(int i = 0; i< 10; i++) {
+
+            sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRanges[i]);
             result.count();
         }
 
