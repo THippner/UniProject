@@ -57,8 +57,10 @@ public class convertCSVtoParq {
 
         //runOrdersRanges(sc, sqlContext, dataRanges);
         //runLineItemRanges(sc, sqlContext, dataRanges);
-        //runOrdersJOINLineItemRangesOrders(sc, sqlContext, dataRanges);
+        runOrdersJOINLineItemRangesOrders(sc, sqlContext, dataRanges);
         //runOrdersJOINLineItemRangesLineItem(sc, sqlContext, dataRanges);
+
+
 
 
 
@@ -82,11 +84,13 @@ public class convertCSVtoParq {
 
         for(int i = 0; i< 10; i++) {
 
+            for(int j = 0; j<5; j++) { // repeat each range 5 times
 
+                sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRanges[i]);
+                result.count();
 
-            sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
-            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRanges[i]);
-            result.count();
+            }
         }
 
 
@@ -96,9 +100,12 @@ public class convertCSVtoParq {
 
         for(int i = 0; i< 10; i++) {
 
-            sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
-            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRanges[i]);
-            result.count();
+            for(int j = 0; j<5; j++) { // repeat each range 5 times
+
+                sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - " + dataRanges[i] + " (" + (i + 1) + "0%)");
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRanges[i]);
+                result.count();
+            }
         }
 
 
