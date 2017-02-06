@@ -1,5 +1,3 @@
-package converter;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.DataFrame;
@@ -14,59 +12,114 @@ import org.apache.spark.sql.types.StructType;
  */
 
 
-public class convertCSVtoParq {
+public class Main {
 
 
 
     public static void main(String[] args) {
 
-        SparkConf conf = new SparkConf().setAppName("UniProject").setMaster("local[2]");
-        JavaSparkContext sc = new JavaSparkContext(conf);
 
+        final String USAGE = "NYI";
+
+        String file_loc = "/home/tomasz"; // default hdfs directory
+
+        int[] dataRanges = {600000,
+                1200000,
+                1800000,
+                2400000,
+                3000000,
+                3600000,
+                4200000,
+                4800000,
+                5400000,
+                6001215};
+
+
+        //override default dir if passed as argument
+        if(args.length == 0){
+            // TODO: print USAGE
+            System.out.println("NYI");
+        }
+        else if(args.length > 1){
+            file_loc = args[1];
+        }
+
+
+
+        // spark setup
+        SparkConf conf = new SparkConf().setAppName("UniProject"); //.setMaster("local[2]"); //@TODO  yarn or yarn-client
+        JavaSparkContext sc = new JavaSparkContext(conf);
         SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
 
 
-        DataFrame lineitem = importLineItemTable(sqlContext);
-        DataFrame orders = importOrdersTable(sqlContext);
 
 
 
 
 
-        lineitem.registerTempTable("lineitem");
-        orders.registerTempTable("orders");
+        if(args[0].equals("1")){
+            // 1 range LI with join
 
-        // force tables into cache
-        lineitem.cache();
-        lineitem.count();
-        orders.cache();
-        orders.count();
+            //DataFrame lineitem = importLineItemTable(sqlContext,file_loc);
+            //DataFrame orders = importOrdersTable(sqlContext,file_loc);
+            //lineitem.registerTempTable("lineitem");
+            //orders.registerTempTable("orders");
+            // force tables into cache
+            //lineitem.cache();
+            //lineitem.count();
+            //orders.cache();
+            //orders.count();
+
+            //runOrdersJOINLineItemRangesLineItem(sc, sqlContext, dataRanges);
+            System.out.println("NYI");
+
+        }
+        else if (args[0].equals("2")){
+            // 2 range O with join
+
+            //DataFrame lineitem = importLineItemTable(sqlContext,file_loc);
+            //DataFrame orders = importOrdersTable(sqlContext,file_loc);
+            //lineitem.registerTempTable("lineitem");
+            //orders.registerTempTable("orders");
+            // force tables into cache
+            //lineitem.cache();
+            //lineitem.count();
+            //orders.cache();
+            //orders.count();
+
+            //runOrdersJOINLineItemRangesOrders(sc, sqlContext, dataRanges);
+            System.out.println("NYI");
+
+        }
+        else if (args[0].equals("3")){
+            // 3 range LI
+
+            DataFrame lineitem = importLineItemTable(sqlContext,file_loc);
+            lineitem.registerTempTable("lineitem");
+            lineitem.cache();
+            lineitem.count();
 
 
-        int[] dataRanges = {600000,
-                                1200000,
-                                1800000,
-                                2400000,
-                                3000000,
-                                3600000,
-                                4200000,
-                                4800000,
-                                5400000,
-                                6001215};
+            runLineItemRanges(sc, sqlContext, dataRanges);
+            //System.out.println("NYI");
 
+        }
+        else if (args[0].equals("4")){
+            // 4 range O
 
-        //runOrdersRanges(sc, sqlContext, dataRanges);
-        //runLineItemRanges(sc, sqlContext, dataRanges);
-        runOrdersJOINLineItemRangesOrders(sc, sqlContext, dataRanges);
-        //runOrdersJOINLineItemRangesLineItem(sc, sqlContext, dataRanges);
+            //DataFrame orders = importOrdersTable(sqlContext,file_loc);
+            //orders.registerTempTable("orders");
+            //orders.cache();
+            //orders.count();
 
+            //runOrdersRanges(sc, sqlContext, dataRanges);
+            System.out.println("NYI");
 
-
-
-
-
-
-
+        }
+        else{
+            // TODO: print USAGE
+            System.out.println("NYI");
+        }
 
 
 
@@ -132,7 +185,7 @@ public class convertCSVtoParq {
         }
     }
 
-    private static DataFrame importLineItemTable(SQLContext sqlContext) {
+    private static DataFrame importLineItemTable(SQLContext sqlContext, String file_loc) {
 
         //example
         //1|63700|3701|3|8|13309.60|0.10|0.02|N|O|1996-01-29|1996-03-05|1996-01-31|TAKE BACK RETURN|REG AIR|riously. regular, express dep|
@@ -185,7 +238,7 @@ public class convertCSVtoParq {
                 .schema(customSchema)
                 .option("delimiter", "|")
                 .option("dateFormat", "YYYY-MM-DD")
-                .load("file:///home/khorm/TestGrounds/DB/lineitem.tbl");
+                .load(file_loc +  "/lineitem.tbl"); // @TODO  change
 
 
         //df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
@@ -233,7 +286,7 @@ public class convertCSVtoParq {
                 .schema(customSchema)
                 .option("delimiter", "|")
                 .option("dateFormat", "YYYY-MM-DD")
-                .load("file:///home/khorm/TestGrounds/DB/orders.tbl");
+                .load("file:///home/khorm/TestGrounds/DB/orders.tbl"); // @TODO  change
 
 
         //df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/orders.parquet");
