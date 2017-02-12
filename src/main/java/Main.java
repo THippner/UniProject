@@ -41,7 +41,7 @@ public class Main {
             // spark setup
             SparkConf conf = new SparkConf().setAppName("UniProject");
             JavaSparkContext sc = new JavaSparkContext(conf);
-            //sc.addJar("/home/tomasz/UniProject.jar");
+
             SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
 
 

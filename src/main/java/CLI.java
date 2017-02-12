@@ -51,17 +51,17 @@ public class CLI {
         options.addOption(FLAG_CACHE, "cache", false , "NYI - force cache the tables in memory");
         options.addOption(FLAG_SCALE, "scale", false , "NYI - tables scale factor");
 
-        options.addOption(Option.builder(FLAG_MODE)
-                .longOpt("mode")
+        options.addOption(OptionBuilder
+                .withLongOpt("mode")
                 .hasArg(true)
-                .required(true)
-                .desc("query modes: \n"+
+                .isRequired(true)
+                .withDescription("query modes: \n"+
                         MODE_RANGE_ORDERS + " - incremental 10% query series on orders table\n" +
                         MODE_RANGE_LINEITEM + " - incremental 10% query series on lineitem table\n" +
                         MODE_JOIN_RANGE_ORDERS + " - join with incremental 10% query series on orders table\n" +
                         MODE_JOIN_RANGE_LINEITEM + " - join with incremental 10% query series on lineitem table\n" +
                         MODE_SAVE_PARQ + " - convert tables to parquett format")
-                .build());
+                .create());
 
 
 
