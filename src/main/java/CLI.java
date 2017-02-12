@@ -35,7 +35,7 @@ public class CLI {
         options = new Options();
         addOptions();
         helpFormatter = new HelpFormatter();
-        commandLineParser = new DefaultParser();
+        commandLineParser = new BasicParser();
         cmd = this.parseCommandLine(args);
 
 
@@ -43,6 +43,7 @@ public class CLI {
 
     }
 
+    @SuppressWarnings("static-access")
     private void addOptions() {
 
 
@@ -61,7 +62,7 @@ public class CLI {
                         MODE_JOIN_RANGE_ORDERS + " - join with incremental 10% query series on orders table\n" +
                         MODE_JOIN_RANGE_LINEITEM + " - join with incremental 10% query series on lineitem table\n" +
                         MODE_SAVE_PARQ + " - convert tables to parquett format")
-                .create());
+                .create(FLAG_MODE));
 
 
 
@@ -113,12 +114,13 @@ public class CLI {
         return Integer.parseInt(cmd.getOptionValue(FLAG_SCALE));
     }
 
-    public boolean hasPath() {
-        return cmd.getArgList().size() > 0;
-    }
 
-    public String getFilePathValue() {
-        return cmd.getArgList().get(0);
+
+    public boolean hasPath() {
+        return cmd.getArgList().size() > 0;    }
+
+    public String getFilePathValue() { //TODO: Merge with has path
+        return cmd.getArgList().get(0).toString();
     }
 
     public boolean hasCache() {
