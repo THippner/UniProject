@@ -46,6 +46,8 @@ public class Main {
 
             if(cli.hasHelp()) {
                 cli.printUsage();
+                sc.stop();
+                System.exit(0);
             }
 
             // if contains scale factor

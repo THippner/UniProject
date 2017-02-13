@@ -50,7 +50,7 @@ public class CLI {
         options.addOption(FLAG_HELP, "help", false, "print help message");
         options.addOption(FLAG_PARQ, "parquet", false, "NYI - read parq rather than CSV tables");
         options.addOption(FLAG_CACHE, "cache", false , "NYI - force cache the tables in memory");
-        options.addOption(FLAG_SCALE, "scale", false , "NYI - tables scale factor");
+        options.addOption(FLAG_SCALE, "scale", true , "TPCH db scale factor for tables");
 
         options.addOption(OptionBuilder
                 .withLongOpt("mode")
