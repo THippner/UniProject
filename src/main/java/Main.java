@@ -135,7 +135,7 @@ public class Main {
 
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) { // repeat queries
 
-                sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - " + dataRangeFactors[i] + " (" + (i + 1) + "0%)");
+                sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - (" + (i + 1) + "0%)");
                 DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRangeFactors[i]*DATA_MULTIPL*scaleFactor);
                 result.count();
 
@@ -157,7 +157,7 @@ public class Main {
 
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) {
 
-                sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - " + dataRangeFactors[i] + " (" + (i + 1) + "0%)");
+                sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - (" + (i + 1) + "0%)");
                 DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRangeFactors[i]*DATA_MULTIPL*scaleFactor);
                 result.count();
             }
@@ -177,9 +177,9 @@ public class Main {
         for(int i = 0; i< dataRangeFactors.length; i++){
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
-                sc.setJobGroup("TH", "LineItem - " + dataRangeFactors[i] + " (" + (i + 1) + "0%)");
+                sc.setJobGroup("TH", "LineItem - (" + (i + 1) + "0%)");
                 DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactors[i] * DATA_MULTIPL * scaleFactor);
-                result.count();
+                long z = result.count();
             }
         }
 
@@ -201,7 +201,7 @@ public class Main {
 
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
-                sc.setJobGroup("TH", "Orders - " + dataRangeFactors[i] + " (" + (i + 1) + "0%)");
+                sc.setJobGroup("TH", "Orders - (" + (i + 1) + "0%)");
                 DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + dataRangeFactors[i] * DATA_MULTIPL * scaleFactor);
                 result.count();
             }
