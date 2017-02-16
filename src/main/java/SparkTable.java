@@ -13,16 +13,19 @@ public class SparkTable {
 
     final static String LINEITEM = "lineitem";
     final static String ORDERS = "orders";
+    final static String PARQUET_EXT = ".parquet";
 
 
     private final String name;
     private DataFrame dataFrame;
+    private final String filePath;
 
 
 
-    private SparkTable(String name, DataFrame dataFrame){
+    private SparkTable(String name, DataFrame dataFrame, String filePath){
         this.name = name;
         this.dataFrame = dataFrame;
+        this.filePath = filePath;
 
     }
 
@@ -32,7 +35,7 @@ public class SparkTable {
         DataFrame df = importLineItemTable(sqlContext, filePath);
         df.registerTempTable(LINEITEM);
 
-        return new SparkTable(LINEITEM, df);
+        return new SparkTable(LINEITEM, df, filePath);
     }
 
     public static SparkTable createOrdersTable(SQLContext sqlContext, String filePath){
@@ -40,7 +43,7 @@ public class SparkTable {
         DataFrame df = importOrdersTable(sqlContext, filePath);
         df.registerTempTable(ORDERS);
 
-        return new SparkTable(ORDERS, df);
+        return new SparkTable(ORDERS, df, filePath);
     }
 
 
@@ -54,6 +57,13 @@ public class SparkTable {
         dataFrame.cache();
         dataFrame.count(); // forces spark to execute actions
     }
+
+
+    public void saveAsParquet(){
+
+        this.dataFrame.saveAsParquetFile(this.filePath + this.name + PARQUET_EXT);
+    }
+
 
     private static DataFrame importLineItemTable(SQLContext sqlContext, String file_loc) {
 

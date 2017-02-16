@@ -92,8 +92,12 @@ public class Main {
 
             }
             else if (cli.modeIsSaveAsParq()){
-                // TODO: df.saveAsParquetFile("file:///home/khorm/TestGrounds/DB/lineitem.parquet");
-                System.out.println("NYI (Save as Parq)");
+                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
+                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
+
+                for(SparkTable table : tables){
+                    table.saveAsParquet();
+                }
             }
             else{
                 System.out.println("ERROR: Unrecognized mode!");
@@ -123,13 +127,13 @@ public class Main {
     }
 
 
-    // save file
-        //result.write().json("file:///home/khorm/TestGrounds/spark-output/out.json");
-
-
 
 
     private static void runJOINOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+
+
+
+
 
         for(int i = 0; i< dataRangeFactors.length; i++) { // shift range value
 
@@ -147,6 +151,10 @@ public class Main {
             DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey");
             result.count();
         }
+
+
+
+
     }
 
 
@@ -174,12 +182,15 @@ public class Main {
 
     private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
 
+
+        long[] countResults = new long[10];
+
         for(int i = 0; i< dataRangeFactors.length; i++){
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "LineItem - (" + (i + 1) + "0%)");
                 DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactors[i] * DATA_MULTIPL * scaleFactor);
-                long z = result.count();
+                countResults[i] = result.count();
             }
         }
 
@@ -187,9 +198,13 @@ public class Main {
 
             sc.setJobGroup("TH", "LineItem - 100%)");
             DataFrame result = sqlContext.sql("SELECT * FROM lineitem");
-            result.count();
+            countResults[9] = result.count();
         }
 
+
+        for(long value : countResults){
+            System.out.print(value);
+        }
     }
 
 
