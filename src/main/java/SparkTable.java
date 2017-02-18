@@ -61,7 +61,9 @@ public class SparkTable {
 
     public void saveAsParquet(){
 
+        //this.dataFrame.saveAsParquetFile("file:///home/tomasz/" + this.name + PARQUET_EXT);
         this.dataFrame.saveAsParquetFile(this.filePath + this.name + PARQUET_EXT);
+        //System.out.println(this.filePath + this.name + PARQUET_EXT);
     }
 
 

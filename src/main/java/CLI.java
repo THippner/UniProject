@@ -9,10 +9,15 @@ public class CLI {
 
     // modes
     private final String MODE_RANGE_ORDERS = "range-orders";
+    private final String MODE_RANGE_ORDERS_ALIAS = "ro";
     private final String MODE_RANGE_LINEITEM = "range-lineitem";
+    private final String MODE_RANGE_LINEITEM_ALIAS = "rl";
     private final String MODE_JOIN_RANGE_ORDERS = "join-range-orders";
+    private final String MODE_JOIN_RANGE_ORDERS_ALIAS = "jro";
     private final String MODE_JOIN_RANGE_LINEITEM = "join-range-lineitem";
-    private final String MODE_SAVE_PARQ = "save-parq";
+    private final String MODE_JOIN_RANGE_LINEITEM_ALIAS = "jrl";
+    private final String MODE_SAVE_PARQ = "save-parquet";
+    private final String MODE_SAVE_PARQ_ALIAS = "sp";
 
     // flags
     private final String FLAG_HELP = "h";
@@ -55,7 +60,7 @@ public class CLI {
         options.addOption(OptionBuilder
                 .withLongOpt("mode")
                 .hasArg(true)
-                .isRequired(true)
+                //.isRequired(true)
                 .withDescription("query modes: \n"+
                         MODE_RANGE_ORDERS + " - incremental 10% query series on orders table\n" +
                         MODE_RANGE_LINEITEM + " - incremental 10% query series on lineitem table\n" +
@@ -71,9 +76,7 @@ public class CLI {
 
 
 
-    public boolean modeIsSaveAsParq(){
-        return cmd.getOptionValue(FLAG_MODE).equals(MODE_SAVE_PARQ);
-    }
+
 
     public boolean hasHelp(){
         return cmd.hasOption(FLAG_HELP);
@@ -90,20 +93,36 @@ public class CLI {
 
     }
 
+
+    // ----------------------------------------------------------------- MODES
     public boolean modeIsRangeOrders() {
-        return cmd.getOptionValue(FLAG_MODE).equals(MODE_RANGE_ORDERS);
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_RANGE_ORDERS) || mode.equals(MODE_RANGE_ORDERS_ALIAS));
     }
 
     public boolean modeIsRangeLineitem() {
-        return cmd.getOptionValue(FLAG_MODE).equals(MODE_RANGE_LINEITEM);
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_RANGE_LINEITEM) || mode.equals(MODE_RANGE_LINEITEM_ALIAS));
     }
 
     public boolean modeIsJoinRangeOrders() {
-        return cmd.getOptionValue(FLAG_MODE).equals(MODE_JOIN_RANGE_ORDERS);
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_JOIN_RANGE_ORDERS) || mode.equals(MODE_JOIN_RANGE_ORDERS_ALIAS));
     }
 
     public boolean modeIsJoinRangeLineitem() {
-        return cmd.getOptionValue(FLAG_MODE).equals(MODE_JOIN_RANGE_LINEITEM);
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_JOIN_RANGE_LINEITEM) || mode.equals(MODE_JOIN_RANGE_LINEITEM_ALIAS));
+    }
+
+    public boolean modeIsSaveAsParq(){
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_SAVE_PARQ) || mode.equals(MODE_SAVE_PARQ_ALIAS));
     }
 
     public boolean hasScaleFactor() {

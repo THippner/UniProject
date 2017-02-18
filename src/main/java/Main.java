@@ -37,18 +37,18 @@ public class Main {
             int scaleFactor = DEFAULT_SCALE;
             String filePath = DEFAULT_PATH;
 
-            // spark setup
-            SparkConf conf = new SparkConf().setAppName("UniProject");
-            JavaSparkContext sc = new JavaSparkContext(conf);
-
-            SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
-
 
             if(cli.hasHelp()) {
                 cli.printUsage();
-                sc.stop();
                 System.exit(0);
             }
+
+            // spark setup
+            SparkConf conf = new SparkConf().setAppName("UniProject");
+            JavaSparkContext sc = new JavaSparkContext(conf);
+            SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
+
+
 
             // if contains scale factor
             if(cli.hasScaleFactor()){
