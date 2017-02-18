@@ -99,6 +99,12 @@ public class Main {
                     table.saveAsParquet();
                 }
             }
+            else if(cli.modeIsDatabaseTest()){ // single count query to both tables
+                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
+                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
+
+                runDatabaseTest(sc, sqlContext, scaleFactor);
+            }
             else{
                 System.out.println("ERROR: Unrecognized mode!");
                 cli.printUsage();                ;
@@ -116,15 +122,21 @@ public class Main {
 
     }
 
-    private static void cacheTableIfSet(CLI cli, Iterable<SparkTable> tables) {
+    private static void runDatabaseTest(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
 
-        if(cli.hasCache()){
-            for(SparkTable table : tables){
-                table.cache();
 
-            }
-        }
+        sc.setJobGroup("TH", "DB test Orders");
+        DataFrame ordersResult = sqlContext.sql("SELECT * FROM orders");
+        ordersResult.count();
+
+        sc.setJobGroup("TH", "DB test Orders");
+        DataFrame lineitemResult = sqlContext.sql("SELECT * FROM lineitem");
+        lineitemResult.count();
+
+
     }
+
+
 
 
 
@@ -232,7 +244,15 @@ public class Main {
 
     }
 
+    private static void cacheTableIfSet(CLI cli, Iterable<SparkTable> tables) {
 
+        if(cli.hasCache()){
+            for(SparkTable table : tables){
+                table.cache();
+
+            }
+        }
+    }
 
 
 

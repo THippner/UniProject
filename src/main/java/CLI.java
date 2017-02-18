@@ -18,6 +18,8 @@ public class CLI {
     private final String MODE_JOIN_RANGE_LINEITEM_ALIAS = "jrl";
     private final String MODE_SAVE_PARQ = "save-parquet";
     private final String MODE_SAVE_PARQ_ALIAS = "sp";
+    private final String MODE_DB_TEST = "database-test";
+    private final String MODE_DB_TEST_ALIAS = "dt";
 
     // flags
     private final String FLAG_HELP = "h";
@@ -62,11 +64,12 @@ public class CLI {
                 .hasArg(true)
                 //.isRequired(true)
                 .withDescription("query modes: \n"+
-                        MODE_RANGE_ORDERS + " - incremental 10% query series on orders table\n" +
-                        MODE_RANGE_LINEITEM + " - incremental 10% query series on lineitem table\n" +
-                        MODE_JOIN_RANGE_ORDERS + " - join with incremental 10% query series on orders table\n" +
-                        MODE_JOIN_RANGE_LINEITEM + " - join with incremental 10% query series on lineitem table\n" +
-                        MODE_SAVE_PARQ + " - convert tables to parquett format")
+                        MODE_RANGE_ORDERS + ", " + MODE_RANGE_ORDERS_ALIAS + " - incremental 10% query series on orders table\n" +
+                        MODE_RANGE_LINEITEM + ", " + MODE_RANGE_LINEITEM_ALIAS + " - incremental 10% query series on lineitem table\n" +
+                        MODE_JOIN_RANGE_ORDERS + ", "+ MODE_JOIN_RANGE_ORDERS_ALIAS + " - join with incremental 10% query series on orders table\n" +
+                        MODE_JOIN_RANGE_LINEITEM + ", "+ MODE_JOIN_RANGE_LINEITEM_ALIAS + " - join with incremental 10% query series on lineitem table\n" +
+                        MODE_SAVE_PARQ + ", "+ MODE_SAVE_PARQ_ALIAS + " - convert tables to parquett format\n" +
+                        MODE_DB_TEST + ", " + MODE_DB_TEST_ALIAS + " - single count query to both tables")
                 .create(FLAG_MODE));
 
 
@@ -124,6 +127,17 @@ public class CLI {
         String mode = cmd.getOptionValue(FLAG_MODE);
         return (mode.equals(MODE_SAVE_PARQ) || mode.equals(MODE_SAVE_PARQ_ALIAS));
     }
+
+    public boolean modeIsDatabaseTest(){
+
+        String mode = cmd.getOptionValue(FLAG_MODE);
+        return (mode.equals(MODE_DB_TEST) || mode.equals(MODE_DB_TEST_ALIAS));
+    }
+
+
+
+
+
 
     public boolean hasScaleFactor() {
         return cmd.hasOption(FLAG_SCALE);
