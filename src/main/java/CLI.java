@@ -142,6 +142,7 @@ public class CLI {
     public boolean hasScaleFactor() {
         return cmd.hasOption(FLAG_SCALE);
     }
+    public boolean hasParquetFlag() { return cmd.hasOption(FLAG_PARQ); }
 
     public int getScaleFactorValue() {
         return Integer.parseInt(cmd.getOptionValue(FLAG_SCALE));

@@ -30,19 +30,34 @@ public class SparkTable {
     }
 
 
-    public static SparkTable createLineitemTable(SQLContext sqlContext, String filePath){
+    public static SparkTable loadLineitemTable(SQLContext sqlContext, String filePath, CLI cli){
 
-        DataFrame df = importLineItemTable(sqlContext, filePath);
+        DataFrame df = null;
+        if(cli.hasParquetFlag()){
+
+            df = sqlContext.read().parquet(filePath + "/" + LINEITEM + ".parquet");
+        }
+        else{
+            df = importLineItemTable(sqlContext, filePath);
+        }
+
         df.registerTempTable(LINEITEM);
-
         return new SparkTable(LINEITEM, df, filePath);
     }
 
-    public static SparkTable createOrdersTable(SQLContext sqlContext, String filePath){
+    public static SparkTable loadOrdersTable(SQLContext sqlContext, String filePath, CLI cli){
 
-        DataFrame df = importOrdersTable(sqlContext, filePath);
+
+        DataFrame df = null;
+        if(cli.hasParquetFlag()){
+
+            df = sqlContext.read().parquet(filePath + "/" + ORDERS + ".parquet");
+        }
+        else{
+            df = importOrdersTable(sqlContext, filePath);
+        }
+
         df.registerTempTable(ORDERS);
-
         return new SparkTable(ORDERS, df, filePath);
     }
 

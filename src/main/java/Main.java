@@ -61,47 +61,38 @@ public class Main {
             }
 
 
-            if(cli.modeIsRangeOrders()){ // range orders
+            // load tables
+            tables.add(SparkTable.loadLineitemTable(sqlContext, filePath, cli));
+            tables.add(SparkTable.loadOrdersTable(sqlContext, filePath, cli));
 
-                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
+
+            if(cli.modeIsRangeOrders()){ // range orders
                 cacheTableIfSet(cli, tables);
                 runOrdersRanges(sc, sqlContext, scaleFactor);
 
             }
             else if(cli.modeIsRangeLineitem()) { // range lineitem
-
-                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
                 cacheTableIfSet(cli, tables);
                 runLineitemRanges(sc, sqlContext, scaleFactor);
 
             }
             else if(cli.modeIsJoinRangeOrders()) { // join range orders
-
-                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
-                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
                 cacheTableIfSet(cli, tables);
                 runJOINOrdersRanges(sc, sqlContext, scaleFactor);
 
             }
             else if(cli.modeIsJoinRangeLineitem()) { // join range lineitem
-
-                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
-                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
                 cacheTableIfSet(cli, tables);
                 runJOINLineitemRanges(sc, sqlContext, scaleFactor);
 
             }
             else if (cli.modeIsSaveAsParq()){
-                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
-                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
 
                 for(SparkTable table : tables){
                     table.saveAsParquet();
                 }
             }
             else if(cli.modeIsDatabaseTest()){ // single count query to both tables
-                tables.add(SparkTable.createLineitemTable(sqlContext, filePath));
-                tables.add(SparkTable.createOrdersTable(sqlContext, filePath));
 
                 runDatabaseTest(sc, sqlContext, scaleFactor);
             }
