@@ -150,7 +150,7 @@ public class Main {
         }
 
         for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) {
-            sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - 100%");
+            sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - 100%");
             DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey");
             result.count();
         }
