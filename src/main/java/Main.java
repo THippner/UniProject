@@ -34,8 +34,10 @@ public class Main {
 
             CLI cli = new CLI(args);
             List<SparkTable> tables = new ArrayList<SparkTable>();
-            int scaleFactor = DEFAULT_SCALE;
+            //int scaleFactor = DEFAULT_SCALE;
             String filePath = DEFAULT_PATH;
+            int multipliedScaleFactor = DATA_MULTIPL; // default x1
+
 
 
             if(cli.hasHelp()) {
@@ -52,7 +54,8 @@ public class Main {
 
             // if contains scale factor
             if(cli.hasScaleFactor()){
-                scaleFactor = cli.getScaleFactorValue();
+                multipliedScaleFactor *= cli.getScaleFactorValue();
+
             }
 
             // if contains optional path
@@ -68,26 +71,26 @@ public class Main {
 
             if(cli.modeIsRangeOrders()){ // range orders
                 cacheTableIfSet(cli, tables);
-                runOrdersRanges(sc, sqlContext, scaleFactor);
+                runOrdersRanges(sc, sqlContext, multipliedScaleFactor);
 
             }
             else if(cli.modeIsRangeLineitem()) { // range lineitem
                 cacheTableIfSet(cli, tables);
-                runLineitemRanges(sc, sqlContext, scaleFactor);
+                runLineitemRanges(sc, sqlContext, multipliedScaleFactor);
 
             } else if (cli.modeIsSingleRangeLineitem() || cli.hasRange()) {
 
                 cacheTableIfSet(cli, tables);
-                runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue());
+                runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue(), multipliedScaleFactor);
             }
             else {
                 if (cli.modeIsJoinRangeOrders()) { // join range orders
                     cacheTableIfSet(cli, tables);
-                    runJOINOrdersRanges(sc, sqlContext, scaleFactor);
+                    runJOINOrdersRanges(sc, sqlContext, multipliedScaleFactor);
 
                 } else if (cli.modeIsJoinRangeLineitem()) { // join range lineitem
                     cacheTableIfSet(cli, tables);
-                    runJOINLineitemRanges(sc, sqlContext, scaleFactor);
+                    runJOINLineitemRanges(sc, sqlContext, multipliedScaleFactor);
 
                 } else if (cli.modeIsSaveAsParq()) {
 
@@ -96,7 +99,7 @@ public class Main {
                     }
                 } else if (cli.modeIsDatabaseTest()) { // single count query to both tables
 
-                    runDatabaseTest(sc, sqlContext, scaleFactor);
+                    runDatabaseTest(sc, sqlContext, multipliedScaleFactor);
                 } else {
                     System.out.println("ERROR: Unrecognized mode!");
                     cli.printUsage();
@@ -116,7 +119,7 @@ public class Main {
 
     }
 
-    private static void runDatabaseTest(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+    private static void runDatabaseTest(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
         sc.setJobGroup("TH", "DB test Orders");
@@ -135,7 +138,7 @@ public class Main {
 
 
 
-    private static void runJOINOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+    private static void runJOINOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
 
@@ -146,7 +149,7 @@ public class Main {
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) { // repeat queries
 
                 sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + DATA_RANGE_FACTORS[i]*DATA_MULTIPL*scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + DATA_RANGE_FACTORS[i] * multipliedScaleFactor);
                 result.count();
 
             }
@@ -165,14 +168,14 @@ public class Main {
 
 
 
-    private static void runJOINLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+    private static void runJOINLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
         for(int i = 0; i< DATA_RANGE_FACTORS.length; i++) {
 
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + DATA_RANGE_FACTORS[i]*DATA_MULTIPL*scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + multipliedScaleFactor);
                 result.count();
             }
         }
@@ -198,7 +201,7 @@ public class Main {
 
 
 
-    private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangePercent) {
+    private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangePercent, int multipliedScaleFactor) {
 
 
             if(rangePercent.equals("100")){ // 100%
@@ -213,7 +216,7 @@ public class Main {
                 int dataRangeFactor = getDataRangeFactor(rangePercent);
 
                 sc.setJobGroup("TH", "Single Range Lineitem - " + rangePercent + "%");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactor*DATA_MULTIPL);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactor * multipliedScaleFactor);
                 result.count();
 
 
@@ -224,7 +227,7 @@ public class Main {
     }
 
 
-    private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+    private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
         long[] countResults = new long[10];
@@ -233,7 +236,7 @@ public class Main {
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "LineItem - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + DATA_RANGE_FACTORS[i] * DATA_MULTIPL * scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + DATA_RANGE_FACTORS[i] * multipliedScaleFactor);
                 countResults[i] = result.count();
             }
         }
@@ -253,7 +256,7 @@ public class Main {
 
 
 
-    private static void runOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
+    private static void runOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
         // Orders 10 to 100% range
         for(int i = 0; i< DATA_RANGE_FACTORS.length; i++){
 
@@ -261,7 +264,7 @@ public class Main {
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "Orders - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + DATA_RANGE_FACTORS[i] * DATA_MULTIPL * scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + DATA_RANGE_FACTORS[i] * multipliedScaleFactor);
                 result.count();
             }
         }
