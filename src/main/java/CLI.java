@@ -10,14 +10,22 @@ public class CLI {
     // modes
     private final String MODE_RANGE_ORDERS = "range-orders";
     private final String MODE_RANGE_ORDERS_ALIAS = "ro";
+
     private final String MODE_RANGE_LINEITEM = "range-lineitem";
     private final String MODE_RANGE_LINEITEM_ALIAS = "rl";
+
+    private final String MODE_SINGLE_RANGE_LINEITEM = "single-range-lineitem";
+    private final String MODE_SINGLE_RANGE_LINEITEM_ALIAS = "srl";
+
     private final String MODE_JOIN_RANGE_ORDERS = "join-range-orders";
     private final String MODE_JOIN_RANGE_ORDERS_ALIAS = "jro";
+
     private final String MODE_JOIN_RANGE_LINEITEM = "join-range-lineitem";
     private final String MODE_JOIN_RANGE_LINEITEM_ALIAS = "jrl";
+
     private final String MODE_SAVE_PARQ = "save-parquet";
     private final String MODE_SAVE_PARQ_ALIAS = "sp";
+
     private final String MODE_DB_TEST = "database-test";
     private final String MODE_DB_TEST_ALIAS = "dt";
 
@@ -27,6 +35,7 @@ public class CLI {
     private final String FLAG_SCALE = "s";
     private final String FLAG_CACHE = "C";
     private final String FLAG_PARQ = "P";
+    private final String FLAG_RANGE = "R";
 
 
 
@@ -58,6 +67,7 @@ public class CLI {
         options.addOption(FLAG_PARQ, "parquet", false, "NYI - read parq rather than CSV tables");
         options.addOption(FLAG_CACHE, "cache", false , "NYI - force cache the tables in memory");
         options.addOption(FLAG_SCALE, "scale", true , "TPCH db scale factor for tables");
+        options.addOption(FLAG_RANGE, "range", true , "Range of data for table [10,20...100]");
 
         options.addOption(OptionBuilder
                 .withLongOpt("mode")
@@ -110,6 +120,12 @@ public class CLI {
         return (mode.equals(MODE_RANGE_LINEITEM) || mode.equals(MODE_RANGE_LINEITEM_ALIAS));
     }
 
+    public boolean modeIsSingleRangeLineitem() {
+
+        String mode = cmd.getOptionValue(FLAG_RANGE);
+        return (mode.equals(MODE_SINGLE_RANGE_LINEITEM) || mode.equals(MODE_SINGLE_RANGE_LINEITEM_ALIAS));
+    }
+
     public boolean modeIsJoinRangeOrders() {
 
         String mode = cmd.getOptionValue(FLAG_MODE);
@@ -147,6 +163,7 @@ public class CLI {
     public int getScaleFactorValue() {
         return Integer.parseInt(cmd.getOptionValue(FLAG_SCALE));
     }
+    public String getRangeValue() { return cmd.getOptionValue(FLAG_RANGE);}
 
 
 
@@ -159,5 +176,8 @@ public class CLI {
 
     public boolean hasCache() {
         return cmd.hasOption(FLAG_CACHE);
+    }
+
+    public boolean hasRange() { return cmd.hasOption(FLAG_RANGE);
     }
 }

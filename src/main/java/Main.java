@@ -19,7 +19,7 @@ public class Main {
     final static int REPEAT_QUERY_NUMBER = 10;
 
     final static int DATA_MULTIPL = 100000;
-    final static int[] dataRangeFactors = {6, 12, 18, 24, 30, 36, 42, 48, 54};
+    final static int[] DATA_RANGE_FACTORS = {6, 12, 18, 24, 30, 36, 42, 48, 54};
 
     final static int DEFAULT_SCALE = 1;
     final static String DEFAULT_PATH = "/user/tomasz/db1/";
@@ -75,30 +75,33 @@ public class Main {
                 cacheTableIfSet(cli, tables);
                 runLineitemRanges(sc, sqlContext, scaleFactor);
 
-            }
-            else if(cli.modeIsJoinRangeOrders()) { // join range orders
+            } else if (cli.modeIsSingleRangeLineitem() || cli.hasRange()) {
+
                 cacheTableIfSet(cli, tables);
-                runJOINOrdersRanges(sc, sqlContext, scaleFactor);
-
+                runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue());
             }
-            else if(cli.modeIsJoinRangeLineitem()) { // join range lineitem
-                cacheTableIfSet(cli, tables);
-                runJOINLineitemRanges(sc, sqlContext, scaleFactor);
+            else {
+                if (cli.modeIsJoinRangeOrders()) { // join range orders
+                    cacheTableIfSet(cli, tables);
+                    runJOINOrdersRanges(sc, sqlContext, scaleFactor);
 
-            }
-            else if (cli.modeIsSaveAsParq()){
+                } else if (cli.modeIsJoinRangeLineitem()) { // join range lineitem
+                    cacheTableIfSet(cli, tables);
+                    runJOINLineitemRanges(sc, sqlContext, scaleFactor);
 
-                for(SparkTable table : tables){
-                    table.saveAsParquet();
+                } else if (cli.modeIsSaveAsParq()) {
+
+                    for (SparkTable table : tables) {
+                        table.saveAsParquet();
+                    }
+                } else if (cli.modeIsDatabaseTest()) { // single count query to both tables
+
+                    runDatabaseTest(sc, sqlContext, scaleFactor);
+                } else {
+                    System.out.println("ERROR: Unrecognized mode!");
+                    cli.printUsage();
+                    ;
                 }
-            }
-            else if(cli.modeIsDatabaseTest()){ // single count query to both tables
-
-                runDatabaseTest(sc, sqlContext, scaleFactor);
-            }
-            else{
-                System.out.println("ERROR: Unrecognized mode!");
-                cli.printUsage();                ;
             }
 
             // close spark
@@ -138,12 +141,12 @@ public class Main {
 
 
 
-        for(int i = 0; i< dataRangeFactors.length; i++) { // shift range value
+        for(int i = 0; i< DATA_RANGE_FACTORS.length; i++) { // shift range value
 
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) { // repeat queries
 
                 sc.setJobGroup("TH", "Order-LineItem JOIN, Order range - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + dataRangeFactors[i]*DATA_MULTIPL*scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE O.orderkey < " + DATA_RANGE_FACTORS[i]*DATA_MULTIPL*scaleFactor);
                 result.count();
 
             }
@@ -164,12 +167,12 @@ public class Main {
 
     private static void runJOINLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
 
-        for(int i = 0; i< dataRangeFactors.length; i++) {
+        for(int i = 0; i< DATA_RANGE_FACTORS.length; i++) {
 
             for(int j = 0; j<REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "Order-LineItem JOIN, LineItem range - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRangeFactors[i]*DATA_MULTIPL*scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + DATA_RANGE_FACTORS[i]*DATA_MULTIPL*scaleFactor);
                 result.count();
             }
         }
@@ -182,17 +185,55 @@ public class Main {
     }
 
 
+    // this will only be called on values below 100
+    private static int getDataRangeFactor(String rangePercent){
+
+
+        int firstDigit = Integer.parseInt(rangePercent.substring(0,1));
+
+        return DATA_RANGE_FACTORS[firstDigit - 1];
+
+
+    }
+
+
+
+    private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangePercent) {
+
+
+            if(rangePercent.equals("100")){ // 100%
+
+                sc.setJobGroup("TH", "Single Range Lineitem - 100%)");
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem");
+                result.count();
+
+            }
+            else{
+
+                int dataRangeFactor = getDataRangeFactor(rangePercent);
+
+                sc.setJobGroup("TH", "Single Range Lineitem - " + rangePercent + "%");
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactor*DATA_MULTIPL);
+                result.count();
+
+
+            }
+
+
+
+    }
+
 
     private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
 
 
         long[] countResults = new long[10];
 
-        for(int i = 0; i< dataRangeFactors.length; i++){
+        for(int i = 0; i< DATA_RANGE_FACTORS.length; i++){
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "LineItem - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactors[i] * DATA_MULTIPL * scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + DATA_RANGE_FACTORS[i] * DATA_MULTIPL * scaleFactor);
                 countResults[i] = result.count();
             }
         }
@@ -214,13 +255,13 @@ public class Main {
 
     private static void runOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int scaleFactor) {
         // Orders 10 to 100% range
-        for(int i = 0; i< dataRangeFactors.length; i++){
+        for(int i = 0; i< DATA_RANGE_FACTORS.length; i++){
 
 
             for(int j = 0; j < REPEAT_QUERY_NUMBER; j++) {
 
                 sc.setJobGroup("TH", "Orders - (" + (i + 1) + "0%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + dataRangeFactors[i] * DATA_MULTIPL * scaleFactor);
+                DataFrame result = sqlContext.sql("SELECT * FROM orders WHERE orderkey < " + DATA_RANGE_FACTORS[i] * DATA_MULTIPL * scaleFactor);
                 result.count();
             }
         }
