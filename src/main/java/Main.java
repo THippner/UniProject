@@ -78,7 +78,8 @@ public class Main {
                 cacheTableIfSet(cli, tables);
                 runLineitemRanges(sc, sqlContext, multipliedScaleFactor);
 
-            } else if (cli.modeIsSingleRangeLineitem() || cli.hasRange()) {
+            }
+            else if (cli.modeIsSingleRangeLineitem() && cli.hasRange()) {
 
                 cacheTableIfSet(cli, tables);
                 runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue(), multipliedScaleFactor);
