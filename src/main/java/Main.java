@@ -84,6 +84,10 @@ public class Main {
                 cacheTableIfSet(cli, tables);
                 runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue(), multipliedScaleFactor);
             }
+            else if (cli.modeIsSingleJoinRangeLineitem() && cli.hasRange()){
+                cacheTableIfSet(cli,tables);
+                runSingleJoinRangeLineitem(sc, sqlContext, cli.getRangeValue(), multipliedScaleFactor);
+            }
             else if (cli.modeIsJoinRangeOrders()) { // join range orders
                 cacheTableIfSet(cli, tables);
                 runJOINOrdersRanges(sc, sqlContext, multipliedScaleFactor);
@@ -120,6 +124,8 @@ public class Main {
 
 
     }
+
+
 
     private static void runDatabaseTest(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
@@ -203,31 +209,48 @@ public class Main {
 
 
 
-    private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangePercent, int multipliedScaleFactor) {
+    private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangeValue, int multipliedScaleFactor) {
+
+        if(rangeValue.equals("100")){ // 100%
+
+            sc.setJobGroup("TH", "Single Range Lineitem - 100%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem");
+            result.count();
+
+        }
+        else{
+
+            int dataRangeFactor = getDataRangeFactor(rangeValue);
+
+            sc.setJobGroup("TH", "Single Range Lineitem - " + rangeValue + "%");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactor * multipliedScaleFactor);
+            result.count();
+        }
+    }
 
 
-            if(rangePercent.equals("100")){ // 100%
+    private static void runSingleJoinRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangeValue, int multipliedScaleFactor) {
 
-                sc.setJobGroup("TH", "Single Range Lineitem - 100%)");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem");
-                result.count();
+        if(rangeValue.equals("100")){
 
-            }
-            else{
-
-                int dataRangeFactor = getDataRangeFactor(rangePercent);
-
-                sc.setJobGroup("TH", "Single Range Lineitem - " + rangePercent + "%");
-                DataFrame result = sqlContext.sql("SELECT * FROM lineitem WHERE orderkey < " + dataRangeFactor * multipliedScaleFactor);
-                result.count();
+            sc.setJobGroup("TH", "Single Join Range Lineitem - 100%)");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey");
+            result.count();
+        }
+        else{
 
 
-            }
+            int dataRangeFactor = getDataRangeFactor(rangeValue);
 
+            sc.setJobGroup("TH", "Single Join Range Lineitem - " + rangeValue + "%");
+            DataFrame result = sqlContext.sql("SELECT * FROM lineitem  L JOIN orders O ON L.orderkey = O.orderkey WHERE L.orderkey < " + dataRangeFactor * multipliedScaleFactor);
+            result.count();
+
+
+        }
 
 
     }
-
 
     private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
