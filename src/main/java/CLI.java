@@ -23,6 +23,10 @@ public class CLI {
     private final String MODE_JOIN_RANGE_LINEITEM = "join-range-lineitem";
     private final String MODE_JOIN_RANGE_LINEITEM_ALIAS = "jrl";
 
+
+    private final String MODE_SINGLE_JOIN_RANGE_LINEITEM = "single-join-range-lineitem";
+    private final String MODE_SINGLE_JOIN_RANGE_LINEITEM_ALIAS = "sjrl";
+
     private final String MODE_SAVE_PARQ = "save-parquet";
     private final String MODE_SAVE_PARQ_ALIAS = "sp";
 
@@ -107,52 +111,64 @@ public class CLI {
     }
 
 
-    // ----------------------------------------------------------------- MODES
+    private String getModeParameter(){
+
+        return cmd.getOptionValue(FLAG_MODE);
+    }
+
+
+    // ----------------------------------------------------------------- MODES START
     public boolean modeIsRangeOrders() {
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_RANGE_ORDERS) || mode.equals(MODE_RANGE_ORDERS_ALIAS));
     }
 
     public boolean modeIsRangeLineitem() {
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_RANGE_LINEITEM) || mode.equals(MODE_RANGE_LINEITEM_ALIAS));
     }
 
     public boolean modeIsSingleRangeLineitem() {
 
-        String mode = cmd.getOptionValue(FLAG_RANGE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_SINGLE_RANGE_LINEITEM) || mode.equals(MODE_SINGLE_RANGE_LINEITEM_ALIAS));
+    }
+
+    public boolean modeIsSingleJoinRangeLineitem(){
+
+        String mode = getModeParameter();
+        return (mode.equals(MODE_SINGLE_JOIN_RANGE_LINEITEM) || mode.equals(MODE_SINGLE_JOIN_RANGE_LINEITEM_ALIAS));
     }
 
     public boolean modeIsJoinRangeOrders() {
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_JOIN_RANGE_ORDERS) || mode.equals(MODE_JOIN_RANGE_ORDERS_ALIAS));
     }
 
     public boolean modeIsJoinRangeLineitem() {
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_JOIN_RANGE_LINEITEM) || mode.equals(MODE_JOIN_RANGE_LINEITEM_ALIAS));
     }
 
     public boolean modeIsSaveAsParq(){
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_SAVE_PARQ) || mode.equals(MODE_SAVE_PARQ_ALIAS));
     }
 
     public boolean modeIsDatabaseTest(){
 
-        String mode = cmd.getOptionValue(FLAG_MODE);
+        String mode = getModeParameter();
         return (mode.equals(MODE_DB_TEST) || mode.equals(MODE_DB_TEST_ALIAS));
     }
 
 
 
-
+    // ===================================================================================== MODES END
 
 
     public boolean hasScaleFactor() {

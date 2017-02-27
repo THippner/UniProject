@@ -83,29 +83,30 @@ public class Main {
                 cacheTableIfSet(cli, tables);
                 runSingleRangeLineitem(sc, sqlContext, cli.getRangeValue(), multipliedScaleFactor);
             }
-            else {
-                if (cli.modeIsJoinRangeOrders()) { // join range orders
-                    cacheTableIfSet(cli, tables);
-                    runJOINOrdersRanges(sc, sqlContext, multipliedScaleFactor);
+            else if (cli.modeIsJoinRangeOrders()) { // join range orders
+                cacheTableIfSet(cli, tables);
+                runJOINOrdersRanges(sc, sqlContext, multipliedScaleFactor);
+            }
+            else if (cli.modeIsJoinRangeLineitem()) { // join range lineitem
+                cacheTableIfSet(cli, tables);
+                runJOINLineitemRanges(sc, sqlContext, multipliedScaleFactor);
 
-                } else if (cli.modeIsJoinRangeLineitem()) { // join range lineitem
-                    cacheTableIfSet(cli, tables);
-                    runJOINLineitemRanges(sc, sqlContext, multipliedScaleFactor);
+            }
+            else if (cli.modeIsSaveAsParq()) {
 
-                } else if (cli.modeIsSaveAsParq()) {
-
-                    for (SparkTable table : tables) {
-                        table.saveAsParquet();
-                    }
-                } else if (cli.modeIsDatabaseTest()) { // single count query to both tables
-
-                    runDatabaseTest(sc, sqlContext, multipliedScaleFactor);
-                } else {
-                    System.out.println("ERROR: Unrecognized mode!");
-                    cli.printUsage();
-                    ;
+                for (SparkTable table : tables) {
+                    table.saveAsParquet();
                 }
             }
+            else if (cli.modeIsDatabaseTest()) { // single count query to both tables
+
+                runDatabaseTest(sc, sqlContext, multipliedScaleFactor);
+            }
+            else {
+                System.out.println("ERROR: Unrecognized mode!");
+                cli.printUsage();
+            }
+
 
             // close spark
             sc.stop();
