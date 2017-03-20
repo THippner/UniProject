@@ -1,3 +1,17 @@
+/**
+ * Tomasz Hippner
+ * 2146437
+ * 
+ * Level 4 Project
+ * School of Computing Science
+ * 
+ * University of Glasgow
+ * 20/3/2017 
+ */
+
+ 
+
+
 import org.apache.spark.sql.DataFrame;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.types.DataTypes;
@@ -6,7 +20,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
 /**
- * Created by khorm on 12/02/17.
+ * Handles all the functionality necesary for importing and using Orders and Lineitem tables.
  */
 public class SparkTable {
 
@@ -75,10 +89,8 @@ public class SparkTable {
 
 
     public void saveAsParquet(){
-
-        //this.dataFrame.saveAsParquetFile("file:///home/tomasz/" + this.name + PARQUET_EXT);
-        this.dataFrame.saveAsParquetFile(this.filePath + this.name + PARQUET_EXT);
-        //System.out.println(this.filePath + this.name + PARQUET_EXT);
+        
+        this.dataFrame.saveAsParquetFile(this.filePath + this.name + PARQUET_EXT);        
     }
 
 

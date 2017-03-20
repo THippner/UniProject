@@ -1,3 +1,16 @@
+/**
+ * Tomasz Hippner
+ * 2146437
+ * 
+ * Level 4 Project
+ * School of Computing Science
+ * 
+ * University of Glasgow
+ * 20/3/2017 
+ */
+
+
+
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.ParseException;
@@ -9,17 +22,18 @@ import org.apache.spark.sql.SQLContext;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * Created by khorm on 18/11/16.
+ * Main running class for the utility.
  */
-
-
 public class Main {
 
     final static int REPEAT_QUERY_NUMBER = 10;
 
-    final static int DATA_MULTIPL = 100000;
-    final static int[] DATA_RANGE_FACTORS = {6, 12, 18, 24, 30, 36, 42, 48, 54};
+    final static int DATA_MULTIPL = 100000; // multiplier to make numbers smaller
+    
+    // numbers that correspond to 10% increments in size for each table
+    final static int[] DATA_RANGE_FACTORS = {6, 12, 18, 24, 30, 36, 42, 48, 54}; 
 
     final static int DEFAULT_SCALE = 1;
     final static String DEFAULT_PATH = "/user/tomasz/db1/";
@@ -33,8 +47,7 @@ public class Main {
         try {
 
             CLI cli = new CLI(args);
-            List<SparkTable> tables = new ArrayList<SparkTable>();
-            //int scaleFactor = DEFAULT_SCALE;
+            List<SparkTable> tables = new ArrayList<SparkTable>();            
             String filePath = DEFAULT_PATH;
             int multipliedScaleFactor = DATA_MULTIPL; // default x1
 
@@ -126,7 +139,9 @@ public class Main {
     }
 
 
-
+	/**
+	 * Simple single query to both tables used for testing of new functionality table
+	 */
     private static void runDatabaseTest(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
@@ -145,7 +160,9 @@ public class Main {
 
 
 
-
+	/**
+	 * Run series of Lineitem-Orders Joins with range constraint on Orders table
+	 */
     private static void runJOINOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
@@ -175,7 +192,9 @@ public class Main {
     }
 
 
-
+	/**
+	 * Run series of Lineitem-Orders Joins with range constraint on Lineitem table
+	 */
     private static void runJOINLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
         for(int i = 0; i< DATA_RANGE_FACTORS.length; i++) {
@@ -208,7 +227,9 @@ public class Main {
     }
 
 
-
+	/**
+	 * Run a single constraint query on Lineitem table
+	 */
     private static void runSingleRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangeValue, int multipliedScaleFactor) {
 
         if(rangeValue.equals("100")){ // 100%
@@ -228,7 +249,9 @@ public class Main {
         }
     }
 
-
+	/**
+	 * Run a single Lineitem-Orders Join with range constraint on Lineitem table
+	 */
     private static void runSingleJoinRangeLineitem(JavaSparkContext sc, SQLContext sqlContext, String rangeValue, int multipliedScaleFactor) {
 
         if(rangeValue.equals("100")){
@@ -252,6 +275,9 @@ public class Main {
 
     }
 
+	/**
+	 * Run series of constraint queries on Lineitem table
+	 */
     private static void runLineitemRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
 
 
@@ -280,7 +306,9 @@ public class Main {
     }
 
 
-
+	/**
+	 * Run series of constraint queries on Orders table
+	 */
     private static void runOrdersRanges(JavaSparkContext sc, SQLContext sqlContext, int multipliedScaleFactor) {
         // Orders 10 to 100% range
         for(int i = 0; i< DATA_RANGE_FACTORS.length; i++){

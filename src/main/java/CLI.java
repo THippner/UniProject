@@ -1,7 +1,19 @@
+/**
+ * Tomasz Hippner
+ * 2146437
+ * 
+ * Level 4 Project
+ * School of Computing Science
+ * 
+ * University of Glasgow
+ * 20/3/2017 
+ */
+
+
 import org.apache.commons.cli.*;
 
 /**
- * Created by khorm on 11/02/17.
+ * Responsible for handling the Command Line Arguments.
  */
 public class CLI {
 
@@ -186,7 +198,7 @@ public class CLI {
     public boolean hasPath() {
         return cmd.getArgList().size() > 0;    }
 
-    public String getFilePathValue() { //TODO: Merge with has path
+    public String getFilePathValue() { 
         return cmd.getArgList().get(0).toString();
     }
 
